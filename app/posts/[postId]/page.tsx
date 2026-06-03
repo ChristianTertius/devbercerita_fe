@@ -5,12 +5,14 @@ import { PostDetailView } from "@/components/PostDetailView";
 export default async function PostDetailPage({
   params,
 }: {
-  params: { postId: string };
+  params: Promise<{ postId: string }>;
 }) {
+  const { postId } = await params;
+
   let post;
 
   try {
-    post = await getPostDetail(params.postId);
+    post = await getPostDetail(postId);
   } catch {
     notFound();
   }

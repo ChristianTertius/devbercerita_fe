@@ -19,13 +19,15 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(() => {
-    if (typeof window === "undefined") {
-      return null;
-    }
+  const [token, setToken] = useState<string | null>(null);
 
-    return window.localStorage.getItem("devb_token");
-  });
+  useEffect(() => {
+    const savedToken = window.localStorage.getItem("devb_token");
+    if (savedToken) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setToken(savedToken);
+    }
+  }, []);
 
   useEffect(() => {
     if (token) {
