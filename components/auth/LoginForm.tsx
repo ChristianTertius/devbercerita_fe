@@ -57,7 +57,7 @@ export function LoginForm() {
         }}
         required
       />
-      {error && <p className="text-sm text-rose">{error}</p>}
+      {error && <p className="text-sm text-red-500">{error}</p>}
       <Button type="submit" disabled={isLoading}>
         {isLoading ? "Memeriksa..." : "Masuk"}
       </Button>

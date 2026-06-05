@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { createPost, updatePost } from "@/lib/api";
+import Link from "next/link";
 
 type PostFormProps = {
   mode: "create" | "edit";
@@ -82,12 +83,45 @@ export function PostForm({ mode, postId, initialValues }: PostFormProps) {
         }}
         required
       />
-      {error && <p className="text-sm text-ink/70">{error}</p>}
+      {error && isAuthenticated && (
+        <p className="text-sm text-ink/70">{error}</p>
+      )}
       <Button type="submit" disabled={isSaving || !isReady}> {/* ← disable juga kalau belum ready */}
         {isSaving
           ? mode === "create" ? "Menyimpan..." : "Memperbarui..."
           : mode === "create" ? "Kirim Cerita" : "Perbarui Cerita"}
       </Button>
+      {!isAuthenticated && error && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-ink/20 backdrop-blur-sm" />
+          {/* Alert */}
+          <div className="relative z-10 w-full max-w-sm rounded-3xl border border-sand/40 bg-paper p-6 shadow-lg">
+            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-sand/20 text-lg">
+              🔒
+            </div>
+            <h2 className="text-lg font-semibold text-ink">Belum login</h2>
+            <p className="mt-2 text-sm text-ink/60">
+              Kamu perlu masuk dulu untuk bisa mengirim cerita.
+            </p>
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                onClick={() => setError(null)}
+                className="rounded-full border border-sand/70 px-4 py-1.5 text-sm font-semibold text-ink transition hover:border-ink"
+              >
+                Nanti dulu
+              </button>
+              <Link
+                href="/auth/login"
+                className="rounded-full border border-ink/40 bg-ink px-4 py-1.5 text-sm font-semibold text-white! transition hover:bg-ink/90"
+              >
+                Login dulu
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
+
   );
 }
