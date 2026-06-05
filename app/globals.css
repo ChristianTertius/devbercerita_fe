@@ -50,8 +50,7 @@ a {
   background: var(--color-cloud);
 }
 
-@keyframes toast {
-
+@keyframes toast-in {
   from {
     opacity: 0;
     transform: translateY(8px);
@@ -63,7 +62,23 @@ a {
   }
 }
 
-.animate-toast {
+/* toast animation */
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
-  animation: toast 0.2s ease-out forwards;
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.animate-toast-in {
+  animation: toast-in 0.2s ease-out forwards;
+}
+
+.animate-toast-out {
+  animation: toast-out 0.2s ease-in forwards;
 }

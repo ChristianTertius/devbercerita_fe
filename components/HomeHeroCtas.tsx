@@ -3,10 +3,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { useToast } from "@/contexts/ToastContext";
 
 export function HomeHeroCtas() {
   const { isAuthenticated, username, logout } = useAuth();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const { showToast } = useToast()
 
   return (
     <div className="flex flex-wrap gap-3">
@@ -43,6 +45,7 @@ export function HomeHeroCtas() {
         onConfirm={() => {
           logout();
           setShowLogoutDialog(false);
+          showToast("Berhasil logout!")
         }}
         onCancel={() => setShowLogoutDialog(false)}
       />

@@ -13,6 +13,7 @@ type Toast = {
   id: number;
   message: string;
   type: ToastType;
+  exiting: boolean;
 };
 
 type ToastContextValue = {
@@ -26,7 +27,16 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const showToast = useCallback((message: string, type: ToastType = "success") => {
     const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
+    setToasts((prev) => [...prev, { id, message, type, exiting: false }]);
+
+    // mulai animasi keluar 200ms sebelum dihapus
+    setTimeout(() => {
+      setToasts((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, exiting: true } : t))
+      );
+    }, 2800);
+
+    // hapus dari DOM setelah animasi selesai
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 3000);
@@ -53,9 +63,8 @@ function ToastList({ toasts }: { toasts: Toast[] }) {
 function ToastItem({ toast }: { toast: Toast }) {
   return (
     <div
-      className={`animate-toast flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium shadow-lg ${toast.type === "success"
-        ? "bg-ink text-white"
-        : "bg-rose-500 text-white"
+      className={`flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium shadow-lg ${toast.exiting ? "animate-toast-out" : "animate-toast-in"
+        } ${toast.type === "success" ? "bg-ink text-white" : "bg-rose-500 text-white"
         }`}
     >
       <span>{toast.type === "success" ? "✓" : "✕"}</span>
