@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getPosts } from "@/lib/api";
 import { PostCard } from "@/components/PostCard";
+import { HomeHeroCtas } from "@/components/HomeHeroCtas";
 
 export default async function HomePage() {
   const posts = await getPosts({ limit: 12, page: 1 });
@@ -16,20 +17,7 @@ export default async function HomePage() {
           Ceritakan push-mu, rintangan produksi, dan insight belajar terbaru. Medium-style, tapi dibuat khusus buat
           yang kerja koding.
         </p>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/posts/create"
-            className="rounded-full border border-ink/40 bg-ink px-5 py-2 text-sm font-semibold text-paper transition hover:bg-ink/90"
-          >
-            Tulis cerita
-          </Link>
-          <Link
-            href="/auth/login"
-            className="rounded-full border border-sand/70 px-5 py-2 text-sm font-semibold text-ink transition hover:border-ink"
-          >
-            Masuk dulu
-          </Link>
-        </div>
+        <HomeHeroCtas />
       </section>
 
       <section className="space-y-6">

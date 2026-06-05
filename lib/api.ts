@@ -16,7 +16,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   };
 
   if (options.token) {
-    headers.Authorization = `Bearer ${options.token}`;
+    headers.Authorization = options.token
   }
 
   const response = await fetch(url, {
@@ -69,7 +69,7 @@ export async function getPosts({
   limit?: number;
   page?: number;
 } = {}): Promise<PostListResponse> {
-  return request<PostListResponse>(`/posts/?limit=${limit}&page=${page}`);
+  return request<PostListResponse>(`/posts?limit=${limit}&page=${page}`); // ✅ fix: hapus trailing slash
 }
 
 export async function getPostDetail(postId: string): Promise<PostDetail> {
