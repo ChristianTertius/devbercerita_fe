@@ -13,6 +13,7 @@ import {
 } from "@/lib/api";
 import { formatDate } from "@/lib/utils";
 import { ConfirmDialog } from "./ui/ConfirmDialog";
+import { useToast } from "@/contexts/ToastContext";
 
 type PostDetailViewProps = {
   post: PostDetail;
@@ -30,6 +31,7 @@ export function PostDetailView({ post }: PostDetailViewProps) {
   const [isSavingComment, setIsSavingComment] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false); // ← tambah
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const { showToast } = useToast();
 
   const isAuthor = isAuthenticated && username === post.username;
 
@@ -68,6 +70,7 @@ export function PostDetailView({ post }: PostDetailViewProps) {
     } finally {
       setIsDeleting(false);
       setShowDeleteDialog(false);
+      showToast("Post berhasil dihapus")
     }
   };
 

@@ -6,6 +6,7 @@ import { Input, Textarea } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { createPost, updatePost } from "@/lib/api";
 import Link from "next/link";
+import { useToast } from "@/contexts/ToastContext";
 
 type PostFormProps = {
   mode: "create" | "edit";
@@ -25,10 +26,9 @@ export function PostForm({ mode, postId, initialValues }: PostFormProps) {
   });
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const { showToast } = useToast();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-
-
     console.log("isReady", isReady)
     console.log("isAuthenticated", isAuthenticated)
     console.log("token: ", token)
@@ -58,6 +58,11 @@ export function PostForm({ mode, postId, initialValues }: PostFormProps) {
       setError((err as Error).message);
     } finally {
       setIsSaving(false);
+      if (mode == 'create') {
+        showToast('berhasil menambahkan cerita!')
+      } else if (postId) {
+        showToast('berhasil update cerita!')
+      }
     }
   };
 
