@@ -1,9 +1,12 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 export function HomeHeroCtas() {
   const { isAuthenticated, username, logout } = useAuth();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   return (
     <div className="flex flex-wrap gap-3">
@@ -15,7 +18,6 @@ export function HomeHeroCtas() {
           Login dulu
         </Link>
       ) : (
-
         <>
           <Link
             href="/posts/create"
@@ -24,13 +26,26 @@ export function HomeHeroCtas() {
             Tulis ceritamu {username}!
           </Link>
           <button
-            onClick={logout}
+            onClick={() => setShowLogoutDialog(true)}
             className="rounded-full border border-sand/70 px-5 py-2 text-sm font-semibold text-ink transition hover:border-ink"
           >
             Logout
           </button>
         </>
       )}
+
+      <ConfirmDialog
+        isOpen={showLogoutDialog}
+        title="Yakin mau logout?"
+        description="Kamu perlu login lagi untuk menulis cerita."
+        confirmLabel="Ya, logout"
+        cancelLabel="Batal"
+        onConfirm={() => {
+          logout();
+          setShowLogoutDialog(false);
+        }}
+        onCancel={() => setShowLogoutDialog(false)}
+      />
     </div>
   );
 }

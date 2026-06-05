@@ -12,6 +12,7 @@ import {
   deletePost, // ← tambah ini (kita buat di api.ts)
 } from "@/lib/api";
 import { formatDate } from "@/lib/utils";
+import { ConfirmDialog } from "./ui/ConfirmDialog";
 
 type PostDetailViewProps = {
   post: PostDetail;
@@ -28,8 +29,8 @@ export function PostDetailView({ post }: PostDetailViewProps) {
   const [commentError, setCommentError] = useState<string | null>(null);
   const [isSavingComment, setIsSavingComment] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false); // ← tambah
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
-  // ← tambah: cek apakah user yang login adalah author post ini
   const isAuthor = isAuthenticated && username === post.username;
 
   const formattedDate = useMemo(
@@ -58,7 +59,6 @@ export function PostDetailView({ post }: PostDetailViewProps) {
   // ← tambah handler delete
   const handleDelete = async () => {
     if (!token) return;
-    if (!confirm("Yakin ingin menghapus cerita ini?")) return;
     setIsDeleting(true);
     try {
       await deletePost({ postId: String(post.id), token });
@@ -67,6 +67,7 @@ export function PostDetailView({ post }: PostDetailViewProps) {
       alert((error as Error).message);
     } finally {
       setIsDeleting(false);
+      setShowDeleteDialog(false);
     }
   };
 
@@ -111,11 +112,21 @@ export function PostDetailView({ post }: PostDetailViewProps) {
               <Button
                 intent="subtle"
                 size="sm"
-                onClick={handleDelete}
+                onClick={() => setShowDeleteDialog(true)}
                 disabled={isDeleting}
               >
                 {isDeleting ? "Menghapus..." : "Hapus"}
               </Button>
+
+              <ConfirmDialog
+                isOpen={showDeleteDialog}
+                title="Hapus cerita ini?"
+                description="Tindakan ini tidak bisa dibatalkan."
+                confirmLabel="Ya, hapus"
+                onConfirm={handleDelete}
+                onCancel={() => setShowDeleteDialog(false)}
+                danger
+              />
             </div>
           )}
         </div>
