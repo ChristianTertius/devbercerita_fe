@@ -141,6 +141,15 @@ export async function login(payload: {
     body: payload,
   });
 }
+export async function deletePost(input: {
+  postId: string;
+  token: string;
+}): Promise<{ message: string }> {
+  return request(`/posts/${input.postId}/delete`, {
+    method: "DELETE",
+    token: input.token,
+  });
+}
 
 export type RegisterPayload = {
   email: string;

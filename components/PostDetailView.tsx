@@ -9,6 +9,7 @@ import {
   PostDetail,
   submitComment,
   togglePostLike,
+  deletePost, // ← tambah ini (kita buat di api.ts)
 } from "@/lib/api";
 import { formatDate } from "@/lib/utils";
 
@@ -18,7 +19,7 @@ type PostDetailViewProps = {
 
 export function PostDetailView({ post }: PostDetailViewProps) {
   const router = useRouter();
-  const { token, isAuthenticated } = useAuth();
+  const { token, username, isAuthenticated } = useAuth(); // ← tambah username
   const [likeCount, setLikeCount] = useState(post.like_count);
   const [hasLiked, setHasLiked] = useState(false);
   const [likeError, setLikeError] = useState<string | null>(null);
@@ -26,6 +27,10 @@ export function PostDetailView({ post }: PostDetailViewProps) {
   const [commentDraft, setCommentDraft] = useState("");
   const [commentError, setCommentError] = useState<string | null>(null);
   const [isSavingComment, setIsSavingComment] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false); // ← tambah
+
+  // ← tambah: cek apakah user yang login adalah author post ini
+  const isAuthor = isAuthenticated && username === post.username;
 
   const formattedDate = useMemo(
     () => `${formatDate(post.created_at)} • diperbarui ${formatDate(post.updated_at)}`,
@@ -37,10 +42,8 @@ export function PostDetailView({ post }: PostDetailViewProps) {
       setLikeError("Masuk agar bisa menyukai cerita ini.");
       return;
     }
-
     setIsLiking(true);
     setLikeError(null);
-
     try {
       await togglePostLike(post.id, token);
       setHasLiked((current) => !current);
@@ -52,28 +55,35 @@ export function PostDetailView({ post }: PostDetailViewProps) {
     }
   };
 
+  // ← tambah handler delete
+  const handleDelete = async () => {
+    if (!token) return;
+    if (!confirm("Yakin ingin menghapus cerita ini?")) return;
+    setIsDeleting(true);
+    try {
+      await deletePost({ postId: String(post.id), token });
+      router.push("/");
+    } catch (error) {
+      alert((error as Error).message);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const handleComment = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     if (!isAuthenticated || !token) {
       setCommentError("Silakan masuk agar bisa ikut komentar.");
       return;
     }
-
     if (!commentDraft.trim()) {
       setCommentError("Tulis komentar sebelum mengirim.");
       return;
     }
-
     setIsSavingComment(true);
     setCommentError(null);
-
     try {
-      await submitComment({
-        postId: post.id,
-        content: commentDraft,
-        token,
-      });
+      await submitComment({ postId: post.id, content: commentDraft, token });
       setCommentDraft("");
       router.refresh();
     } catch (error) {
@@ -86,7 +96,29 @@ export function PostDetailView({ post }: PostDetailViewProps) {
   return (
     <section className="space-y-8 rounded-3xl border border-sand/40 bg-paper/90 p-6 shadow-sm">
       <div className="space-y-3">
-        <div className="text-xs uppercase tracking-[0.3em] text-sand">{post.username}</div>
+        <div className="flex items-center justify-between">
+          <div className="text-xs uppercase tracking-[0.3em] text-sand">{post.username}</div>
+          {/* ← tombol edit & delete, hanya muncul untuk author */}
+          {isAuthor && (
+            <div className="flex gap-2">
+              <Button
+                intent="subtle"
+                size="sm"
+                onClick={() => router.push(`/posts/${post.id}/edit`)}
+              >
+                Edit
+              </Button>
+              <Button
+                intent="subtle"
+                size="sm"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Menghapus..." : "Hapus"}
+              </Button>
+            </div>
+          )}
+        </div>
         <h1 className="text-4xl font-semibold leading-tight text-ink">{post.title}</h1>
         <p className="text-sm text-ink/70">{formattedDate}</p>
       </div>
