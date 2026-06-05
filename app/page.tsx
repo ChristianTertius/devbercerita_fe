@@ -7,11 +7,11 @@ export default async function HomePage() {
   const posts = await getPosts({ limit: 12, page: 1 });
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 pb-16 pt-10">
+    <main className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 pb-16 pt-5">
       <section className="space-y-4 rounded-3xl border border-sand/50 bg-paper/80 p-8">
         <p className="text-sm uppercase tracking-[0.3em] text-sand">DevBercerita</p>
         <h1 className="text-4xl font-semibold leading-tight text-ink">
-          Curahan cerita developer dalam bahasa sehari-hari.
+          Curahan cerita developer.
         </h1>
         <p className="text-lg text-ink/70">
           Ceritakan push-mu, rintangan produksi, dan insight belajar terbaru. Medium-style, tapi dibuat khusus buat
