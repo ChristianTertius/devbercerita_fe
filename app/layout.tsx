@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Source_Sans_3 } from "next/font/google";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { AuthWelcome } from "@/components/AuthWelcome";
 import { NavBar } from "@/components/NavBar";
 import "./globals.css";
 
@@ -33,8 +32,7 @@ export default function RootLayout({
       <body className="flex min-h-screen flex-col bg-cloud text-ink antialiased">
         <AuthProvider>
           <div className="page-shell flex w-full flex-1 flex-col gap-8 px-4 py-6 lg:px-0">
-          <NavBar />
-          <AuthWelcome />
+            <NavBar />
             <div className="flex-1">{children}</div>
           </div>
         </AuthProvider>
