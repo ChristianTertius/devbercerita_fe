@@ -5,12 +5,13 @@ import { PostForm } from "@/components/PostForm";
 export default async function EditPostPage({
   params,
 }: {
-  params: { postId: string };
+  params: Promise<{ postId: string }>;
 }) {
-  let post;
+  const { postId } = await params;
 
+  let post;
   try {
-    post = await getPostDetail(params.postId);
+    post = await getPostDetail(postId);
   } catch {
     notFound();
   }
@@ -24,7 +25,7 @@ export default async function EditPostPage({
       <div className="rounded-3xl border border-sand/40 bg-paper/80 p-6">
         <PostForm
           mode="edit"
-          postId={params.postId}
+          postId={postId}
           initialValues={{ title: post.title, content: post.content }}
         />
       </div>
