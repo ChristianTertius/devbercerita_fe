@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Source_Sans_3 } from "next/font/google";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ToastProvider } from "@/contexts/ToastContext";
 import { NavBar } from "@/components/NavBar";
 import "./globals.css";
 
@@ -31,10 +32,12 @@ export default function RootLayout({
     <html lang="id" className={`${heading.variable} ${body.variable}`}>
       <body className="flex min-h-screen flex-col bg-cloud text-ink antialiased">
         <AuthProvider>
-          <div className="page-shell flex w-full flex-1 flex-col gap-8 px-4 py-6 lg:px-0">
-            <NavBar />
-            <div className="flex-1">{children}</div>
-          </div>
+          <ToastProvider>
+            <div className="page-shell flex w-full flex-1 flex-col gap-8 px-4 py-6 lg:px-0">
+              <NavBar />
+              <div className="flex-1">{children}</div>
+            </div>
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>

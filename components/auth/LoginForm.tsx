@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { login } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 
 export function LoginForm() {
   const router = useRouter();
+  const { showToast } = useToast();
   const { login: saveToken } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +24,7 @@ export function LoginForm() {
     try {
       const { token } = await login(form);
       saveToken(token);
+      showToast("Berhasil masuk, selamat datang kembali!");
       router.push("/");
     } catch (err) {
       setError((err as Error).message);

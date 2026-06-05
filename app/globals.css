@@ -49,3 +49,21 @@ a {
   min-height: 100vh;
   background: var(--color-cloud);
 }
+
+@keyframes toast {
+
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-toast {
+
+  animation: toast 0.2s ease-out forwards;
+}
