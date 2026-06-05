@@ -8,7 +8,7 @@ export function BackButton() {
   return (
     <button
       onClick={() => router.back()}
-      className="self-start text-sm text-ink/50 transition  hover:text-ink"
+      className="self-start text-sm text-ink/50 transition  hover:text-ink cursor-pointer"
     >← Kembali</button>
   )
 }

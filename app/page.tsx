@@ -14,8 +14,7 @@ export default async function HomePage() {
           Curahan cerita developer.
         </h1>
         <p className="text-lg text-ink/70">
-          Ceritakan push-mu, rintangan produksi, dan insight belajar terbaru. Medium-style, tapi dibuat khusus buat
-          yang kerja koding.
+          Ceritakan pengalamanmu sebagai developer!
         </p>
         <HomeHeroCtas />
       </section>

@@ -105,6 +105,7 @@ export function PostDetailView({ post }: PostDetailViewProps) {
               <Button
                 intent="subtle"
                 size="sm"
+                className="cursor-pointer"
                 onClick={() => router.push(`/posts/${post.id}/edit`)}
               >
                 Edit
@@ -113,6 +114,7 @@ export function PostDetailView({ post }: PostDetailViewProps) {
                 intent="subtle"
                 size="sm"
                 onClick={() => setShowDeleteDialog(true)}
+                className="cursor-pointer"
                 disabled={isDeleting}
               >
                 {isDeleting ? "Menghapus..." : "Hapus"}

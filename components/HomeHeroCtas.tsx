@@ -29,7 +29,7 @@ export function HomeHeroCtas() {
           </Link>
           <button
             onClick={() => setShowLogoutDialog(true)}
-            className="rounded-full border border-sand/70 px-5 py-2 text-sm font-semibold text-ink transition hover:border-ink"
+            className="rounded-full cursor-pointer border border-sand/70 px-5 py-2 text-sm font-semibold text-ink transition hover:border-ink"
           >
             Logout
           </button>

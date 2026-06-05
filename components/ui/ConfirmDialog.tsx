@@ -67,7 +67,7 @@ export function ConfirmDialog({
           </Button>
           <Button
             size="sm"
-            className={danger ? "border-transparent bg-rose-500 text-white hover:bg-rose-600" : ""}
+            className={danger ? "border-transparent bg-rose-500 text-white hover:bg-rose-600 cursor-pointer" : ""}
             onClick={onConfirm}
           >
             {confirmLabel}
