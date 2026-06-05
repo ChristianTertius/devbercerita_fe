@@ -50,8 +50,8 @@ export function PostForm({ mode, postId, initialValues }: PostFormProps) {
         router.push("/");
       } else if (postId) {
         await updatePost({ postId, ...formState, token });
-        router.push(`/posts/${postId}`);  // ← navigate dulu
-        router.refresh();                  // ← lalu refresh server data
+        router.push(`/posts/${postId}`);
+        router.refresh();
       }
     } catch (err) {
       setError((err as Error).message);

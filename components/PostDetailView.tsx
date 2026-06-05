@@ -122,8 +122,10 @@ export function PostDetailView({ post }: PostDetailViewProps) {
         <h1 className="text-4xl font-semibold leading-tight text-ink">{post.title}</h1>
         <p className="text-sm text-ink/70">{formattedDate}</p>
       </div>
-      <div className="space-y-6 rounded-2xl border border-sand/40 bg-cloud/60 p-5 text-lg leading-relaxed text-ink/90">
-        <p>{post.content}</p>
+      <div className="space-y-4 rounded-2xl text-lg leading-relaxed text-ink/90">
+        {post.content.split("\n").filter(Boolean).map((paragraph, i) => (
+          <p key={i}>{paragraph}</p>
+        ))}
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <Button intent="subtle" size="sm" onClick={handleLike} disabled={isLiking}>
