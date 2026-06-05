@@ -1,6 +1,16 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
 
+input:focus,
+textarea:focus,
+select:focus,
+button:focus {
+
+  outline: none !important;
+
+  box-shadow: none !important;
+}
+
 @theme {
   --color-sand: #a9a496;
   --color-paper: #ffffff;
