@@ -2,9 +2,17 @@ import Link from "next/link";
 import { getPosts } from "@/lib/api";
 import { PostCard } from "@/components/PostCard";
 import { HomeHeroCtas } from "@/components/HomeHeroCtas";
+import { Pagination } from "@/components/ui/Pagination";
 
-export default async function HomePage() {
-  const posts = await getPosts({ limit: 12, page: 1 });
+type Props = {
+  searchParams: Promise<{ page?: string }>;
+};
+
+export default async function HomePage({ searchParams }: Props) {
+  const { page: pageParam } = await searchParams;
+  const page = Number(pageParam) || 1;
+  const posts = await getPosts({ limit: 12, page });
+
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 pb-16 pt-10">
       <section className="space-y-4 rounded-3xl border border-sand/50 bg-paper/80 p-8">
@@ -17,6 +25,7 @@ export default async function HomePage() {
         </p>
         <HomeHeroCtas />
       </section>
+
       <section className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-semibold text-ink">Kumpulan cerita terbaru</h2>
@@ -24,6 +33,7 @@ export default async function HomePage() {
             + Tambah posting
           </Link>
         </div>
+
         {posts.data.length ? (
           <div className="grid gap-6 md:grid-cols-2 [&>*]:h-full">
             {posts.data.map((post) => (
@@ -31,8 +41,12 @@ export default async function HomePage() {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-ink/70">Belum ada cerita yang terkumpul. Jadilah orang pertama yang bercerita.</p>
+          <p className="text-sm text-ink/70">
+            Belum ada cerita yang terkumpul. Jadilah orang pertama yang bercerita.
+          </p>
         )}
+
+        <Pagination currentPage={page} totalPage={posts.total_page} />
       </section>
     </main>
   );
