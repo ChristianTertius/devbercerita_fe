@@ -13,7 +13,6 @@ const SORT_OPTIONS = [
   { label: "Terbaru", sortBy: "created_at", order: "desc" },
   { label: "Terlama", sortBy: "created_at", order: "asc" },
   { label: "Terpopuler", sortBy: "like_count", order: "desc" },
-  { label: "Paling sedikit disukai", sortBy: "like_count", order: "asc" },
 ];
 
 export function PostFilters({ search, sortBy, order }: Props) {
