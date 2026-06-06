@@ -3,15 +3,23 @@ import { getPosts } from "@/lib/api";
 import { PostCard } from "@/components/PostCard";
 import { HomeHeroCtas } from "@/components/HomeHeroCtas";
 import { Pagination } from "@/components/ui/Pagination";
+import { PostFilters } from "@/components/ui/PostFilters";
+
 
 type Props = {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{
+    page?: string;
+    search?: string;
+    sort_by?: string;
+    order?: string;
+  }>;
 };
 
 export default async function HomePage({ searchParams }: Props) {
-  const { page: pageParam } = await searchParams;
+  const { page: pageParam, search = "", sort_by = "created_at", order = "desc" } = await searchParams;
   const page = Number(pageParam) || 1;
-  const posts = await getPosts({ limit: 12, page });
+
+  const posts = await getPosts({ limit: 12, page, search, sortBy: sort_by, order });
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 pb-16 pt-10">
@@ -34,6 +42,8 @@ export default async function HomePage({ searchParams }: Props) {
           </Link>
         </div>
 
+        <PostFilters search={search} sortBy={sort_by} order={order} />
+
         {posts.data.length ? (
           <div className="grid gap-6 md:grid-cols-2 [&>*]:h-full">
             {posts.data.map((post) => (
@@ -46,7 +56,13 @@ export default async function HomePage({ searchParams }: Props) {
           </p>
         )}
 
-        <Pagination currentPage={page} totalPage={posts.total_page} />
+        <Pagination
+          currentPage={page}
+          totalPage={posts.total_page}
+          search={search}
+          sortBy={sort_by}
+          order={order}
+        />
       </section>
     </main>
   );

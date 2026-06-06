@@ -67,11 +67,24 @@ export type PostListResponse = {
 export async function getPosts({
   limit = 12,
   page = 1,
+  search = "",
+  sortBy = "created_at",
+  order = "desc",
 }: {
   limit?: number;
   page?: number;
+  search?: string;
+  sortBy?: string;
+  order?: string;
 } = {}): Promise<PostListResponse> {
-  return request<PostListResponse>(`/posts?limit=${limit}&page=${page}`);
+  const params = new URLSearchParams({
+    limit: String(limit),
+    page: String(page),
+    sort_by: sortBy,
+    order,
+  });
+  if (search) params.set("search", search);
+  return request<PostListResponse>(`/posts?${params}`);
 }
 
 export async function getPostDetail(postId: string, token?: string | null): Promise<PostDetail> {

@@ -5,33 +5,40 @@ import { useRouter } from "next/navigation";
 type Props = {
   currentPage: number;
   totalPage: number;
+  search?: string;
+  sortBy?: string;
+  order?: string;
 };
 
 function getPageNumbers(current: number, total: number): (number | "...")[] {
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-
   const pages: (number | "...")[] = [1];
-
   if (current > 3) pages.push("...");
-
   const start = Math.max(2, current - 1);
   const end = Math.min(total - 1, current + 1);
-
   for (let i = start; i <= end; i++) pages.push(i);
-
   if (current < total - 2) pages.push("...");
-
   pages.push(total);
-
   return pages;
 }
 
-export function Pagination({ currentPage, totalPage }: Props) {
+export function Pagination({
+  currentPage,
+  totalPage,
+  search = "",
+  sortBy = "created_at",
+  order = "desc",
+}: Props) {
   const router = useRouter();
 
   if (totalPage <= 1) return null;
 
-  const goTo = (page: number) => router.push(`/?page=${page}`);
+  const goTo = (page: number) => {
+    const params = new URLSearchParams({ page: String(page), sort_by: sortBy, order });
+    if (search) params.set("search", search);
+    router.push(`/?${params}`);
+  };
+
   const pages = getPageNumbers(currentPage, totalPage);
 
   return (
