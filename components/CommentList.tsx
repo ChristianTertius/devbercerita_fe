@@ -71,19 +71,25 @@ function CommentItem({ comment }: { comment: PostComment }) {
 
   return (
     <>
-      <div className="rounded-2xl border border-sand/40 bg-paper/80 p-4">
-        <div className="flex items-center justify-between text-xs uppercase tracking-[0.3em] text-sand">
-          <span>{comment.username}</span>
-          <span>{formatDate(comment.created_at)}</span>
+      <div className="flex gap-3.5 py-4 border-b border-sand/15 last:border-b-0">
+        {/* Avatar */}
+        <div className="w-8 h-8 rounded-full bg-rose flex items-center justify-center text-[11px] font-semibold text-sand shrink-0 mt-0.5 uppercase">
+          {comment.username.slice(0, 2)}
         </div>
-        <p className="mt-2 text-base text-ink/80">{comment.content}</p>
-        <div className="mt-3 flex items-center text-sm text-ink/60">
+
+        {/* Body */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-baseline gap-2 mb-1">
+            <span className="text-xs font-semibold text-ink">{comment.username}</span>
+            <span className="text-[11px] text-ink/35">{formatDate(comment.created_at)}</span>
+          </div>
+          <p className="text-sm leading-relaxed text-ink/75 mb-2">{comment.content}</p>
           <button
             onClick={handleLike}
             disabled={isLiking}
-            className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition ${hasLiked
+            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition ${hasLiked
               ? "border-rose-300 bg-rose-50 text-rose-500"
-              : "border-sand/40 bg-paper text-ink/60 hover:border-ink/40 hover:text-ink"
+              : "border-sand/35 text-ink/40 hover:border-rose-300 hover:text-rose-400"
               }`}
           >
             <span>{hasLiked ? "❤️" : "🤍"}</span>
