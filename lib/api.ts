@@ -132,6 +132,16 @@ export async function submitComment(payload: {
   });
 }
 
+export async function toggleCommentLike(commentId: number, token: string) {
+  return request<{ message: string }>("/comments/action", {
+    method: "POST",
+    token,
+    body: {
+      comment_id: commentId,
+    },
+  });
+}
+
 export async function login(payload: {
   email: string;
   password: string;
