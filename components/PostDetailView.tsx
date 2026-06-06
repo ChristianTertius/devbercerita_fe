@@ -1,15 +1,12 @@
-// PostDetailView.tsx
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { getPostDetail } from "@/lib/api";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CommentList } from "@/components/CommentList";
 import { useAuth } from "@/contexts/AuthContext";
-import { PostDetail, submitComment, togglePostLike, deletePost } from "@/lib/api";
+import { PostDetail, submitComment, togglePostLike, deletePost, getPostDetail } from "@/lib/api";
 import { formatDate } from "@/lib/utils";
 import { ConfirmDialog } from "./ui/ConfirmDialog";
 import { useToast } from "@/contexts/ToastContext";
@@ -18,16 +15,13 @@ type PostDetailViewProps = {
   post: PostDetail;
 };
 
-// Reusable alert modal untuk belum login
 function LoginAlert({ isOpen, onClose, message }: { isOpen: boolean; onClose: () => void; message: string }) {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-ink/20 backdrop-blur-sm" onClick={onClose} />
       <div className="relative z-10 w-full max-w-sm rounded-3xl border border-sand/40 bg-paper p-6 shadow-lg">
-        <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-sand/20 text-lg">
-          🔒
-        </div>
+        <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-sand/20 text-lg">🔒</div>
         <h2 className="text-lg font-semibold text-ink">Belum login</h2>
         <p className="mt-2 text-sm text-ink/60">{message}</p>
         <div className="mt-6 flex justify-end gap-2">
@@ -39,7 +33,7 @@ function LoginAlert({ isOpen, onClose, message }: { isOpen: boolean; onClose: ()
           </button>
           <Link
             href="/auth/login"
-            className="rounded-full border border-ink/40 bg-ink px-4 py-1.5 text-sm font-semibold text-white! transition hover:bg-ink/90"
+            className="rounded-full border border-ink/40 bg-ink px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-ink/90"
           >
             Login dulu
           </Link>
@@ -57,6 +51,7 @@ export function PostDetailView({ post }: PostDetailViewProps) {
   const [likeCount, setLikeCount] = useState(post.like_count);
   const [hasLiked, setHasLiked] = useState(post.is_liked);
   const [isLiking, setIsLiking] = useState(false);
+  const [comments, setComments] = useState(post.comments); // ← pakai state
   const [commentDraft, setCommentDraft] = useState("");
   const [commentError, setCommentError] = useState<string | null>(null);
   const [isSavingComment, setIsSavingComment] = useState(false);
@@ -64,13 +59,25 @@ export function PostDetailView({ post }: PostDetailViewProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showLikeAlert, setShowLikeAlert] = useState(false);
   const [showCommentAlert, setShowCommentAlert] = useState(false);
+  const [isLikedReady, setIsLikedReady] = useState(false);
 
   const isAuthor = isAuthenticated && username === post.username;
-  const [isLikedReady, setIsLikedReady] = useState(false);
+
   const formattedDate = useMemo(
     () => `${formatDate(post.created_at)} • diperbarui ${formatDate(post.updated_at)}`,
     [post.created_at, post.updated_at],
   );
+
+  // re-fetch dengan token untuk dapat is_liked yang benar
+  useEffect(() => {
+    if (!token || isLikedReady) return;
+    getPostDetail(String(post.id), token).then((freshPost) => {
+      setHasLiked(freshPost.is_liked);
+      setLikeCount(freshPost.like_count);
+      setComments(freshPost.comments); // ← update comments dengan is_liked
+      setIsLikedReady(true);
+    });
+  }, [token, post.id, isLikedReady]);
 
   const handleLike = async () => {
     if (!token || !username) {
@@ -128,14 +135,8 @@ export function PostDetailView({ post }: PostDetailViewProps) {
       setIsSavingComment(false);
     }
   };
-  useEffect(() => {
-    if (!token || isLikedReady) return;
-    getPostDetail(String(post.id), token).then((freshPost) => {
-      setHasLiked(freshPost.is_liked);
-      setLikeCount(freshPost.like_count);
-      setIsLikedReady(true);
-    });
-  }, [token, post.id, isLikedReady]); return (
+
+  return (
     <section className="space-y-8 rounded-3xl border border-sand/40 bg-paper/90 p-6 shadow-sm">
       <div className="space-y-3">
         <div className="flex items-center justify-between">
@@ -182,12 +183,12 @@ export function PostDetailView({ post }: PostDetailViewProps) {
           <span className="text-base">{hasLiked ? "❤️" : "🤍"}</span>
           <span>{likeCount}</span>
         </button>
-        <p className="text-sm text-ink/60">{post.comments.length} komentar</p>
+        <p className="text-sm text-ink/60">{comments.length} komentar</p>
       </div>
 
       <div className="space-y-3">
         <h2 className="text-xl font-semibold text-ink">Komentar</h2>
-        <CommentList comments={post.comments} />
+        <CommentList comments={comments} /> {/* ← pakai state comments */}
       </div>
 
       <form onSubmit={handleComment} className="space-y-3">
@@ -212,7 +213,6 @@ export function PostDetailView({ post }: PostDetailViewProps) {
         </div>
       </form>
 
-      {/* Alert modals */}
       <LoginAlert
         isOpen={showLikeAlert}
         onClose={() => setShowLikeAlert(false)}

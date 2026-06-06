@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { PostComment } from "@/lib/api";
 import { toggleCommentLike } from "@/lib/api";
@@ -44,9 +44,15 @@ export function CommentList({ comments }: { comments: PostComment[] }) {
 function CommentItem({ comment }: { comment: PostComment }) {
   const { token } = useAuth();
   const [likeCount, setLikeCount] = useState(comment.like_count);
-  const [hasLiked, setHasLiked] = useState(false);
+  console.log("comment.is_liked:", comment.id, comment.is_liked);
+  const [hasLiked, setHasLiked] = useState(comment.is_liked);
   const [isLiking, setIsLiking] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+
+  useEffect(() => {
+    setHasLiked(comment.is_liked);
+    setLikeCount(comment.like_count);
+  }, [comment.is_liked, comment.like_count]);
 
   const handleLike = async () => {
     if (!token) {
@@ -76,8 +82,8 @@ function CommentItem({ comment }: { comment: PostComment }) {
             onClick={handleLike}
             disabled={isLiking}
             className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition ${hasLiked
-                ? "border-rose-300 bg-rose-50 text-rose-500"
-                : "border-sand/40 bg-paper text-ink/60 hover:border-ink/40 hover:text-ink"
+              ? "border-rose-300 bg-rose-50 text-rose-500"
+              : "border-sand/40 bg-paper text-ink/60 hover:border-ink/40 hover:text-ink"
               }`}
           >
             <span>{hasLiked ? "❤️" : "🤍"}</span>

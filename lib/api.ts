@@ -42,6 +42,7 @@ export type PostComment = {
   username: string;
   content: string;
   like_count: number;
+  is_liked: boolean;
   created_at: string;
 };
 
