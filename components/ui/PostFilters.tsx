@@ -13,6 +13,7 @@ const SORT_OPTIONS = [
   { label: "Terbaru", sortBy: "created_at", order: "desc" },
   { label: "Terlama", sortBy: "created_at", order: "asc" },
   { label: "Terpopuler", sortBy: "like_count", order: "desc" },
+  { label: "Paling sedikit disukai", sortBy: "like_count", order: "asc" },
 ];
 
 export function PostFilters({ search, sortBy, order }: Props) {
@@ -25,7 +26,22 @@ export function PostFilters({ search, sortBy, order }: Props) {
     SORT_OPTIONS.find((o) => o.sortBy === sortBy && o.order === order) ??
     SORT_OPTIONS[0];
 
-  // close on outside click
+  // realtime search dengan debounce
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const params = new URLSearchParams({
+        page: "1",
+        search: q,
+        sort_by: sortBy,
+        order,
+      });
+      router.push(`/?${params}`);
+    }, 400);
+
+    return () => clearTimeout(timeout);
+  }, [q]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // close dropdown on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -36,20 +52,15 @@ export function PostFilters({ search, sortBy, order }: Props) {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const apply = (overrides: Record<string, string> = {}) => {
+  const selectSort = (opt: (typeof SORT_OPTIONS)[0]) => {
+    setOpen(false);
     const params = new URLSearchParams({
       page: "1",
       search: q,
-      sort_by: sortBy,
-      order,
-      ...overrides,
+      sort_by: opt.sortBy,
+      order: opt.order,
     });
     router.push(`/?${params}`);
-  };
-
-  const selectSort = (opt: (typeof SORT_OPTIONS)[0]) => {
-    setOpen(false);
-    apply({ sort_by: opt.sortBy, order: opt.order });
   };
 
   return (
@@ -58,7 +69,6 @@ export function PostFilters({ search, sortBy, order }: Props) {
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && apply({ search: q })}
         placeholder="Cari cerita..."
         className="min-w-48 rounded-lg border border-sand/30 bg-paper px-3 py-1.5 text-sm text-ink placeholder:text-ink/40 focus:outline-none focus:ring-1 focus:ring-sand"
       />
@@ -95,7 +105,13 @@ export function PostFilters({ search, sortBy, order }: Props) {
                     }`}
                 >
                   {isActive && (
-                    <svg className="h-3.5 w-3.5 shrink-0 text-sand" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <svg
+                      className="h-3.5 w-3.5 shrink-0 text-sand"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   )}
