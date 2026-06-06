@@ -33,7 +33,7 @@ function LoginAlert({ isOpen, onClose, message }: { isOpen: boolean; onClose: ()
           </button>
           <Link
             href="/auth/login"
-            className="rounded-full border border-ink/40 bg-ink px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-ink/90"
+            className="rounded-full border border-ink/40 bg-ink px-4 py-1.5 text-sm font-semibold text-white! transition hover:bg-ink/90"
           >
             Login dulu
           </Link>
