@@ -46,13 +46,11 @@ export function ConfirmDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
       <div
         className={`absolute inset-0 bg-ink/20 backdrop-blur-sm transition-opacity duration-200 ${visible ? "opacity-100" : "opacity-0"
           }`}
         onClick={onCancel}
       />
-      {/* Dialog */}
       <div
         className={`relative z-10 w-full max-w-sm rounded-3xl border border-sand/40 bg-paper p-6 shadow-lg transition-all duration-200 ${visible ? "scale-100 opacity-100" : "scale-95 opacity-0"
           }`}

@@ -49,9 +49,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const isFirstRender = useRef(true); // ← tambah ini
+  const isFirstRender = useRef(true);
 
-  // ✅ Fix: skip saat initial mount agar tidak hapus token sebelum dibaca
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;

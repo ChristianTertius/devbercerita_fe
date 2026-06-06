@@ -19,7 +19,7 @@ type PostFormProps = {
 
 export function PostForm({ mode, postId, initialValues }: PostFormProps) {
   const router = useRouter();
-  const { token, isAuthenticated, isReady } = useAuth(); // ← tambah isReady
+  const { token, isAuthenticated, isReady } = useAuth();
   const [formState, setFormState] = useState({
     title: initialValues?.title || "",
     content: initialValues?.content || "",
@@ -34,7 +34,7 @@ export function PostForm({ mode, postId, initialValues }: PostFormProps) {
     console.log("token: ", token)
 
     event.preventDefault();
-    if (!isReady) return; // ← tunggu localStorage selesai dibaca
+    if (!isReady) return;
     if (!isAuthenticated || !token) {
       setError("Masuk dulu agar bisa mengirim cerita.");
       return;

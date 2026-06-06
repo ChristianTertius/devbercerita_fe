@@ -51,7 +51,7 @@ export function PostDetailView({ post }: PostDetailViewProps) {
   const [likeCount, setLikeCount] = useState(post.like_count);
   const [hasLiked, setHasLiked] = useState(post.is_liked);
   const [isLiking, setIsLiking] = useState(false);
-  const [comments, setComments] = useState(post.comments); // ← pakai state
+  const [comments, setComments] = useState(post.comments);
   const [commentDraft, setCommentDraft] = useState("");
   const [commentError, setCommentError] = useState<string | null>(null);
   const [isSavingComment, setIsSavingComment] = useState(false);
@@ -74,7 +74,7 @@ export function PostDetailView({ post }: PostDetailViewProps) {
     getPostDetail(String(post.id), token).then((freshPost) => {
       setHasLiked(freshPost.is_liked);
       setLikeCount(freshPost.like_count);
-      setComments(freshPost.comments); // ← update comments dengan is_liked
+      setComments(freshPost.comments);
       setIsLikedReady(true);
     });
   }, [token, post.id, isLikedReady]);
@@ -129,7 +129,6 @@ export function PostDetailView({ post }: PostDetailViewProps) {
       setCommentDraft("");
       showToast("Komentar berhasil dikirim!");
 
-      // ✅ fetch ulang post untuk dapat comments terbaru
       const freshPost = await getPostDetail(String(post.id), token);
       setComments(freshPost.comments);
     } catch (error) {

@@ -71,7 +71,7 @@ export async function getPosts({
   limit?: number;
   page?: number;
 } = {}): Promise<PostListResponse> {
-  return request<PostListResponse>(`/posts?limit=${limit}&page=${page}`); // ✅ fix: hapus trailing slash
+  return request<PostListResponse>(`/posts?limit=${limit}&page=${page}`);
 }
 
 export async function getPostDetail(postId: string, token?: string | null): Promise<PostDetail> {
