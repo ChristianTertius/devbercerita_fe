@@ -51,6 +51,7 @@ export type PostDetail = {
   username: string;
   content: string;
   like_count: number;
+  is_liked: boolean;
   comments: PostComment[];
   created_at: string;
   updated_at: string;
@@ -72,8 +73,8 @@ export async function getPosts({
   return request<PostListResponse>(`/posts?limit=${limit}&page=${page}`); // ✅ fix: hapus trailing slash
 }
 
-export async function getPostDetail(postId: string): Promise<PostDetail> {
-  return request<PostDetail>(`/posts/${postId}/detail`);
+export async function getPostDetail(postId: string, token?: string | null): Promise<PostDetail> {
+  return request<PostDetail>(`/posts/${postId}/detail`, { token });
 }
 
 export async function createPost(input: {

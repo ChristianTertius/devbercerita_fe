@@ -1,16 +1,15 @@
+// PostDetailView.tsx
 "use client";
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { getPostDetail } from "@/lib/api";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CommentList } from "@/components/CommentList";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  PostDetail,
-  submitComment,
-  togglePostLike,
-  deletePost, // ← tambah ini (kita buat di api.ts)
-} from "@/lib/api";
+import { PostDetail, submitComment, togglePostLike, deletePost } from "@/lib/api";
 import { formatDate } from "@/lib/utils";
 import { ConfirmDialog } from "./ui/ConfirmDialog";
 import { useToast } from "@/contexts/ToastContext";
@@ -19,65 +18,97 @@ type PostDetailViewProps = {
   post: PostDetail;
 };
 
+// Reusable alert modal untuk belum login
+function LoginAlert({ isOpen, onClose, message }: { isOpen: boolean; onClose: () => void; message: string }) {
+  if (!isOpen) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-ink/20 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative z-10 w-full max-w-sm rounded-3xl border border-sand/40 bg-paper p-6 shadow-lg">
+        <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-sand/20 text-lg">
+          🔒
+        </div>
+        <h2 className="text-lg font-semibold text-ink">Belum login</h2>
+        <p className="mt-2 text-sm text-ink/60">{message}</p>
+        <div className="mt-6 flex justify-end gap-2">
+          <button
+            onClick={onClose}
+            className="rounded-full border border-sand/70 px-4 py-1.5 text-sm font-semibold text-ink transition hover:border-ink"
+          >
+            Nanti dulu
+          </button>
+          <Link
+            href="/auth/login"
+            className="rounded-full border border-ink/40 bg-ink px-4 py-1.5 text-sm font-semibold text-white! transition hover:bg-ink/90"
+          >
+            Login dulu
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function PostDetailView({ post }: PostDetailViewProps) {
   const router = useRouter();
-  const { token, username, isAuthenticated } = useAuth(); // ← tambah username
+  const { token, username, isAuthenticated } = useAuth();
+  const { showToast } = useToast();
+
   const [likeCount, setLikeCount] = useState(post.like_count);
-  const [hasLiked, setHasLiked] = useState(false);
-  const [likeError, setLikeError] = useState<string | null>(null);
+  const [hasLiked, setHasLiked] = useState(post.is_liked);
   const [isLiking, setIsLiking] = useState(false);
   const [commentDraft, setCommentDraft] = useState("");
   const [commentError, setCommentError] = useState<string | null>(null);
   const [isSavingComment, setIsSavingComment] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false); // ← tambah
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const { showToast } = useToast();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showLikeAlert, setShowLikeAlert] = useState(false);
+  const [showCommentAlert, setShowCommentAlert] = useState(false);
 
   const isAuthor = isAuthenticated && username === post.username;
-
+  const [isLikedReady, setIsLikedReady] = useState(false);
   const formattedDate = useMemo(
     () => `${formatDate(post.created_at)} • diperbarui ${formatDate(post.updated_at)}`,
     [post.created_at, post.updated_at],
   );
 
   const handleLike = async () => {
-    if (!token) {
-      setLikeError("Masuk agar bisa menyukai cerita ini.");
+    if (!token || !username) {
+      setShowLikeAlert(true);
       return;
     }
     setIsLiking(true);
-    setLikeError(null);
     try {
       await togglePostLike(post.id, token);
-      setHasLiked((current) => !current);
-      setLikeCount((current) => Math.max(0, current + (hasLiked ? -1 : 1)));
+      const next = !hasLiked;
+      setHasLiked(next);
+      setLikeCount((current) => Math.max(0, current + (next ? 1 : -1)));
     } catch (error) {
-      setLikeError((error as Error).message);
+      showToast((error as Error).message, "error");
     } finally {
       setIsLiking(false);
     }
   };
 
-  // ← tambah handler delete
   const handleDelete = async () => {
     if (!token) return;
     setIsDeleting(true);
     try {
       await deletePost({ postId: String(post.id), token });
+      showToast("Post berhasil dihapus");
       router.push("/");
     } catch (error) {
-      alert((error as Error).message);
+      showToast((error as Error).message, "error");
     } finally {
       setIsDeleting(false);
       setShowDeleteDialog(false);
-      showToast("Post berhasil dihapus")
     }
   };
 
   const handleComment = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!isAuthenticated || !token) {
-      setCommentError("Silakan masuk agar bisa ikut komentar.");
+      setShowCommentAlert(true);
       return;
     }
     if (!commentDraft.trim()) {
@@ -90,39 +121,33 @@ export function PostDetailView({ post }: PostDetailViewProps) {
       await submitComment({ postId: post.id, content: commentDraft, token });
       setCommentDraft("");
       router.refresh();
+      showToast("Komentar berhasil dikirim!");
     } catch (error) {
-      setCommentError((error as Error).message);
+      showToast((error as Error).message, "error");
     } finally {
       setIsSavingComment(false);
     }
   };
-
-  return (
+  useEffect(() => {
+    if (!token || isLikedReady) return;
+    getPostDetail(String(post.id), token).then((freshPost) => {
+      setHasLiked(freshPost.is_liked);
+      setLikeCount(freshPost.like_count);
+      setIsLikedReady(true);
+    });
+  }, [token, post.id, isLikedReady]); return (
     <section className="space-y-8 rounded-3xl border border-sand/40 bg-paper/90 p-6 shadow-sm">
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="text-xs uppercase tracking-[0.3em] text-sand">{post.username}</div>
-          {/* ← tombol edit & delete, hanya muncul untuk author */}
           {isAuthor && (
             <div className="flex gap-2">
-              <Button
-                intent="subtle"
-                size="sm"
-                className="cursor-pointer"
-                onClick={() => router.push(`/posts/${post.id}/edit`)}
-              >
+              <Button intent="subtle" size="sm" className="cursor-pointer" onClick={() => router.push(`/posts/${post.id}/edit`)}>
                 Edit
               </Button>
-              <Button
-                intent="subtle"
-                size="sm"
-                onClick={() => setShowDeleteDialog(true)}
-                className="cursor-pointer"
-                disabled={isDeleting}
-              >
+              <Button intent="subtle" size="sm" onClick={() => setShowDeleteDialog(true)} className="cursor-pointer" disabled={isDeleting}>
                 {isDeleting ? "Menghapus..." : "Hapus"}
               </Button>
-
               <ConfirmDialog
                 isOpen={showDeleteDialog}
                 title="Hapus cerita ini?"
@@ -138,22 +163,33 @@ export function PostDetailView({ post }: PostDetailViewProps) {
         <h1 className="text-4xl font-semibold leading-tight text-ink">{post.title}</h1>
         <p className="text-sm text-ink/70">{formattedDate}</p>
       </div>
+
       <div className="space-y-4 rounded-2xl text-lg leading-relaxed text-ink/90">
         {post.content.split("\n").filter(Boolean).map((paragraph, i) => (
           <p key={i}>{paragraph}</p>
         ))}
       </div>
+
       <div className="flex flex-wrap items-center gap-2">
-        <Button intent="subtle" size="sm" onClick={handleLike} disabled={isLiking}>
-          {isLiking ? "Memproses..." : `Tunjukkan suka (${likeCount})`}
-        </Button>
+        <button
+          onClick={handleLike}
+          disabled={isLiking}
+          className={`flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium transition ${hasLiked
+            ? "border-rose-300 bg-rose-50 text-rose-500"
+            : "border-sand/40 bg-paper text-ink/60 hover:border-ink/40 hover:text-ink"
+            }`}
+        >
+          <span className="text-base">{hasLiked ? "❤️" : "🤍"}</span>
+          <span>{likeCount}</span>
+        </button>
         <p className="text-sm text-ink/60">{post.comments.length} komentar</p>
       </div>
-      {likeError && <p className="text-sm text-rose">{likeError}</p>}
+
       <div className="space-y-3">
         <h2 className="text-xl font-semibold text-ink">Komentar</h2>
         <CommentList comments={post.comments} />
       </div>
+
       <form onSubmit={handleComment} className="space-y-3">
         <label className="text-sm font-semibold uppercase tracking-[0.3em] text-sand">
           Tinggalkan komentar
@@ -175,6 +211,18 @@ export function PostDetailView({ post }: PostDetailViewProps) {
           </Button>
         </div>
       </form>
+
+      {/* Alert modals */}
+      <LoginAlert
+        isOpen={showLikeAlert}
+        onClose={() => setShowLikeAlert(false)}
+        message="Kamu perlu masuk dulu untuk menyukai cerita ini."
+      />
+      <LoginAlert
+        isOpen={showCommentAlert}
+        onClose={() => setShowCommentAlert(false)}
+        message="Kamu perlu masuk dulu untuk ikut berkomentar."
+      />
     </section>
   );
 }
