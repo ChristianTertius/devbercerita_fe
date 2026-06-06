@@ -127,8 +127,11 @@ export function PostDetailView({ post }: PostDetailViewProps) {
     try {
       await submitComment({ postId: post.id, content: commentDraft, token });
       setCommentDraft("");
-      router.refresh();
       showToast("Komentar berhasil dikirim!");
+
+      // ✅ fetch ulang post untuk dapat comments terbaru
+      const freshPost = await getPostDetail(String(post.id), token);
+      setComments(freshPost.comments);
     } catch (error) {
       showToast((error as Error).message, "error");
     } finally {
