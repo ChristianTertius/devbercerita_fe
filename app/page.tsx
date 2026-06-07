@@ -5,7 +5,6 @@ import { HomeHeroCtas } from "@/components/HomeHeroCtas";
 import { Pagination } from "@/components/ui/Pagination";
 import { PostFilters } from "@/components/ui/PostFilters";
 
-
 type Props = {
   searchParams: Promise<{
     page?: string;
@@ -18,8 +17,8 @@ type Props = {
 export default async function HomePage({ searchParams }: Props) {
   const { page: pageParam, search = "", sort_by = "created_at", order = "desc" } = await searchParams;
   const page = Number(pageParam) || 1;
-
   const posts = await getPosts({ limit: 12, page, search, sortBy: sort_by, order });
+  const data = posts.data ?? [];
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 pb-16 pt-10">
@@ -44,9 +43,9 @@ export default async function HomePage({ searchParams }: Props) {
 
         <PostFilters search={search} sortBy={sort_by} order={order} />
 
-        {posts.data.length ? (
+        {data.length ? (
           <div className="grid gap-6 md:grid-cols-2 [&>*]:h-full">
-            {posts.data.map((post) => (
+            {data.map((post) => (
               <PostCard key={post.id} post={post} />
             ))}
           </div>

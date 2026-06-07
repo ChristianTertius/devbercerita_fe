@@ -72,12 +72,10 @@ function CommentItem({ comment }: { comment: PostComment }) {
   return (
     <>
       <div className="flex gap-3.5 py-4 border-b border-sand/15 last:border-b-0">
-        {/* Avatar */}
         <div className="w-8 h-8 rounded-full bg-rose flex items-center justify-center text-[11px] font-semibold text-sand shrink-0 mt-0.5 uppercase">
           {comment.username.slice(0, 2)}
         </div>
 
-        {/* Body */}
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2 mb-1">
             <span className="text-xs font-semibold text-ink">{comment.username}</span>
