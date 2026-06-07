@@ -44,7 +44,6 @@ export function CommentList({ comments }: { comments: PostComment[] }) {
 function CommentItem({ comment }: { comment: PostComment }) {
   const { token } = useAuth();
   const [likeCount, setLikeCount] = useState(comment.like_count);
-  console.log("comment.is_liked:", comment.id, comment.is_liked);
   const [hasLiked, setHasLiked] = useState(comment.is_liked);
   const [isLiking, setIsLiking] = useState(false);
   const [showAlert, setShowAlert] = useState(false);

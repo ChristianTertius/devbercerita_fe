@@ -19,6 +19,9 @@ const body = Source_Sans_3({
 
 export const metadata: Metadata = {
   title: "DevBercerita",
+  icons: {
+    icon: "/logo.png",
+  },
   description:
     "Platform blogging dan forum yang membantu developer berbagi cerita, pengalaman, dan insight fresh.",
 };

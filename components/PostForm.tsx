@@ -29,10 +29,6 @@ export function PostForm({ mode, postId, initialValues }: PostFormProps) {
   const { showToast } = useToast();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    console.log("isReady", isReady)
-    console.log("isAuthenticated", isAuthenticated)
-    console.log("token: ", token)
-
     event.preventDefault();
     if (!isReady) return;
     if (!isAuthenticated || !token) {
